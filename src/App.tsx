@@ -57,10 +57,10 @@ const filteredTransactions = MOCK_TRANSACTIONS.filter(
       selectedCategory === 'All' ||
       transaction.category === selectedCategory;
 
-    const matchesSearch =
-      transaction.description
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
+  const matchesSearch =
+  transaction.description.toLowerCase().includes(searchText.toLowerCase()) ||
+  transaction.category.toLowerCase().includes(searchText.toLowerCase()) ||
+  transaction.date.includes(searchText);
 
     return matchesCategory && matchesSearch;
   },
@@ -219,6 +219,5 @@ Track your income and expenses in one place.
 
 );
 }
-
 
 export default App;
