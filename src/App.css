@@ -93,8 +93,9 @@ box-shadow: 0 5px 20px rgb(15 23 42 / 4%);
 display: flex;
 align-items: center;
 justify-content: space-between;
-gap: 20px;
 margin-bottom: 24px;
+flex-wrap: wrap;
+gap: 16px;
 }
 
 .section-heading h2 {
@@ -128,6 +129,40 @@ border-radius: 9px;
 background: #fff;
 color: #0f172a;
 font: inherit;
+}
+
+
+.search-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 180px;
+  width: 100%;
+}
+
+.search-control label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.search-control input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-control input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .table-container {

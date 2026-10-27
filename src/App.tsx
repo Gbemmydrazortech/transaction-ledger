@@ -44,15 +44,26 @@ function App() {
 const [selectedCategory, setSelectedCategory] =
 useState<string>('All');
 
+const [searchText, setSearchText] = useState<string>('');
+
 const categories = [
 'All',
 ...new Set(MOCK_TRANSACTIONS.map((transaction) => transaction.category)),
 ];
 
 const filteredTransactions = MOCK_TRANSACTIONS.filter(
-(transaction) =>
-selectedCategory === 'All' ||
-transaction.category === selectedCategory,
+  (transaction) => {
+    const matchesCategory =
+      selectedCategory === 'All' ||
+      transaction.category === selectedCategory;
+
+    const matchesSearch =
+      transaction.description
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  },
 );
 
 const totalBalance = filteredTransactions.reduce(
@@ -108,6 +119,22 @@ Track your income and expenses in one place.
         <h2>Recent Transactions</h2>
         <p>Review your latest financial activity.</p>
       </div>
+      
+    <div className="search-control">
+  <label htmlFor="transaction-search">
+    Search Transactions
+  </label>
+
+  <input
+    id="transaction-search"
+    type="text"
+    placeholder="Search descriptions..."
+    value={searchText}
+    onChange={(event) =>
+      setSearchText(event.target.value)
+    }
+  />
+</div>
 
       <div className="filter-control">
         <label htmlFor="category-filter">Category</label>
