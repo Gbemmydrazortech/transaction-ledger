@@ -220,4 +220,5 @@ Track your income and expenses in one place.
 );
 }
 
+
 export default App;
