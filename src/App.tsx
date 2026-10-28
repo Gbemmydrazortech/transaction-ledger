@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import './App.css';
 
 interface Transaction {
@@ -46,12 +46,67 @@ useState<string>('All');
 
 const [searchText, setSearchText] = useState<string>('');
 
+const [description, setDescription] = useState('');
+const [amount, setAmount] = useState('');
+const [category, setCategory] = useState('');
+const [date, setDate] = useState('');
+
+function handleAddTransaction(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  
+if (
+  !description.trim() ||
+  !amount.trim() ||
+  !category ||
+  !date ||
+  !Number.isFinite(Number(amount)) ||
+  Number(amount) === 0
+) {
+  return;
+}
+
+  const newTransaction: Transaction = {
+    id: crypto.randomUUID
+   ? crypto.randomUUID()
+   : String(Date.now()),
+    description: description.trim(),
+    amount: Number(amount),
+    category,
+    date,
+  };
+
+  setTransactions((previousTransactions) => [
+    newTransaction,
+    ...previousTransactions,
+  ]);
+
+  setDescription('');
+  setAmount('');
+  setCategory('');
+  setDate('');
+}
+  
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+const savedTransactions = localStorage.getItem('transactions');
+
+if (savedTransactions) {
+return JSON.parse(savedTransactions) as Transaction[];
+}
+
+return MOCK_TRANSACTIONS;
+});
+  
+  useEffect(() => {
+localStorage.setItem('transactions', JSON.stringify(transactions));
+}, [transactions]);
+  
 const categories = [
 'All',
-...new Set(MOCK_TRANSACTIONS.map((transaction) => transaction.category)),
+...new Set(transactions.map((transaction) => transaction.category)),
 ];
 
-const filteredTransactions = MOCK_TRANSACTIONS.filter(
+const filteredTransactions = transactions.filter(
   (transaction) => {
     const matchesCategory =
       selectedCategory === 'All' ||
@@ -66,7 +121,7 @@ const filteredTransactions = MOCK_TRANSACTIONS.filter(
   },
 );
 
-const totalBalance = filteredTransactions.reduce(
+const totalBalance = transactions.reduce(
 (sum, transaction) => sum + transaction.amount,
 0,
 );
@@ -93,24 +148,79 @@ Track your income and expenses in one place.
       Demo Account
     </div>
   </header>
+  
+<section className="transaction-form-section">
+  <h2>Add New Transaction</h2>
+
+  <form onSubmit={handleAddTransaction}>
+    <div className="form-group">
+      <label htmlFor="description">Description</label>
+      <input
+        id="description"
+        type="text"
+        placeholder="e.g. Salary payment"
+        value={description}
+        onChange={(event) => setDescription(event.target.value)}
+      />
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="amount">Amount (₦)</label>
+      <input
+        id="amount"
+        type="number"
+        step="0.01"
+        placeholder="e.g. 5000 for income, and -5000 for expenses"
+        value={amount}
+        onChange={(event) => setAmount(event.target.value)}
+      />
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="category">Category</label>
+      <select
+        id="category"
+        value={category}
+        onChange={(event) => setCategory(event.target.value)}
+      >
+        <option value="">Select category</option>
+       <option value="Salary">Salary</option>
+       <option value="Groceries">Groceries</option>
+       <option value="Investment">Investment</option>
+      <option value="Transport">Transport</option>
+      <option value="Bills">Bills</option>
+      </select>
+    </div>
+
+    <div className="form-group">
+      <label htmlFor="date">Date</label>
+      <input
+        id="date"
+        type="date"
+        value={date}
+        onChange={(event) => setDate(event.target.value)}
+      />
+    </div>
+
+    <button type="submit">Add Transaction</button>
+  </form>
+</section>
 
   <section className="balance-card" aria-live="polite">
     <p className="balance-label">
-      {selectedCategory === 'All'
-        ? 'Total Balance'
-        : `${selectedCategory} Balance`}
+      Total Balance
     </p>
 
     <h2 className={totalBalance < 0 ? 'negative' : 'positive'}>
       {formatCurrency(totalBalance)}
     </h2>
 
-    <p className="balance-note">
-      Calculated from {filteredTransactions.length}{' '}
-      {filteredTransactions.length === 1
-        ? 'transaction'
-        : 'transactions'}
-    </p>
+   <p className="balance-note">
+   Calculated from {transactions.length}{' '}
+   {transactions.length === 1
+    ? 'transaction'
+    : 'transactions'}
+   </p>
   </section>
 
   <section className="transactions-section">
@@ -207,7 +317,7 @@ Track your income and expenses in one place.
 
     <p className="table-footer">
       Showing {filteredTransactions.length} of{' '}
-      {MOCK_TRANSACTIONS.length} transactions
+      {transactions.length} transactions
     </p>
   </section>
 
